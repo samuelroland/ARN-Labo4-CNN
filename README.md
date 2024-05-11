@@ -133,22 +133,6 @@ La topologie de notre réseau est la suivante:
 1. L5: Couche de sortie de **perceptrons**: 10 neurones car 10 classes (chiffres de 0 à 9), fonction d'activation `softmax`
 
 Nous n'avons pas changé la loss function (toujours `categorical_crossentropy`) et l'optimizer `RMSprop`.
-```python
-l0 = Input(shape=(height, width, 1), name='l0')
-l1 = Conv2D(50, (10,10), padding='same', activation='relu', name='l1')(l0)
-l1_mp = MaxPooling2D(pool_size=(2,2), name='l1_mp')(l1)
-drop1 = Dropout(0.5)(l1_mp)
-l2 = Conv2D(50, (10,10), padding='same', activation='relu', name='l2')(drop1)
-l2_mp = MaxPooling2D(pool_size=(2,2), name='l2_mp')(l2)
-drop2 = Dropout(0.5)(l2_mp)
-l3 = Conv2D(50, (10,10), padding='same', activation='relu', name='l3')(drop2)
-l3_mp = MaxPooling2D(pool_size=(2,2), name='l3_mp')(l3)
-flat = Flatten(name='flat')(l3_mp)
-l4 = Dense(20, activation='relu', name='l4')(flat)
-l5 = Dense(n_classes, activation='softmax', name='l5')(l4)
-model = Model(inputs=l0, outputs=l5)
-model.summary()
-```
 
 **Nombre de poids synaptiques**
 
