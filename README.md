@@ -53,6 +53,7 @@ Nous avons continué de monter (100 filtres) pour continuer sur ce gros gain de 
 ![](imgs/overfitting.png)
 
 Nous avons ensuite tenté de monter la taille des filtres, cela n'améliore que légèrement ici...
+![](imgs/2024-05-10_19-23_7.png)
 ![](imgs/2024-05-10_18-55_1.png)
 
 Ce qui est intéressant c'est de voir que dès qu'on rebaisse de 50 à 40 de nombre de filtres, la performance est un poil moins bonne et on voit tout de suite que la distance entre les 2 courbes se creusent à nouveau. Ce paramètre a l'air crucial pour que le modèle apprenne assez.
@@ -71,26 +72,27 @@ Nous avons ensuite ajouté du dropout simple de 0.1 après la première couche d
 Puis avec 2 dropout intermédiaires
 ![](imgs/2024-05-10_19-24.png)
 
-![](imgs/2024-05-10_19-23_3.png)
-![](imgs/2024-05-10_19-23.png)
-![](imgs/2024-05-10_19-23_4.png)
-![](imgs/2024-05-10_19-23_2.png)
-![](imgs/2024-05-10_19-23_1.png)
-![](imgs/2024-05-10_22-07.png)
-![](imgs/2024-05-10_22-13.png)
-![](imgs/2024-05-10_19-23_7.png)
 ![](imgs/2024-05-10_19-24_1.png)
 
+Peut-être que d'avoir un deuxième dropout plus petit est plus fin en terme d'impact.
 
-![](imgs/2024-05-10_19-23_5.png)
-![](imgs/2024-05-10_19-23_6.png)
+Afin de pouvoir d'augmenter la complexité du modèle pour qu'il apprenne encore plus, tout en évittant l'overfitting nous avons augmenté les dropout à 2 fois 0.5, tout l'enjeu est d'arriver à donner au modèle un moyen de ne pas pouvoir se concentrer sur des mauvaises caractéristiques au lieu enlevant une partie des poids synaptiques à chaque batch, mais tout en lui laissant assez d'informations pour qu'il puisse quand même arriver à bien généraliser. En effet, si augmente trop le Dropout la performance recommence à redescendre...
 
+Nous avons aussi testé des configurations plus mélangées juste pour l'avoir testé une fois, cela ne donne rien de très facile à analyser ni de meilleur que précédemment...
+![](imgs/2024-05-10_19-23.png)
 
-![](imgs/2024-05-10_18-38.png)
+Voici la confirmation de notre intuition que laisser beaucoup plus d'epochs ne servira a rien, l'overfitting est énorme ici.
+![](imgs/2024-05-10_22-07.png)
+![](imgs/2024-05-10_22-13.png)
 
 A un moment donné, la configuration suivante (3 fois 30 filtres de 10x10, max pooling de 2x2 toujours, avec 2 fois 0.5 de dropout intermédiaire) a donné une accuracy de **99.5%** ! C'était plus un coup de chance car la même configuration n'a jamais redonné ce même record pour ce labo.
 
 ![](imgs/2024-05-10_17-43.png)
+
+Notre modèle finale performe à **99.4%**, avec un léger overfitting dès 20 epochs.
+![modelefinale.png](imgs/modelefinale.png)
+
+TODO: describe topology
 
 <!-- The CNNs models are deeper (have more layers), do they have more weights than the
 shallow ones? explain with one example. -->
