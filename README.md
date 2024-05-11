@@ -45,12 +45,14 @@ Comme demandé, nous avons tenté de changer la taille des filtres, le nombre de
 ![](imgs/2024-05-10_19-23_10.png)
 
 IL y avait également très souvent des configurations qui nous donnait une courbe d'entrainement significativement plus haute que celle d'entrainement, nous indiquant underfitting à cause que notre modèle n'apprend pas assez/qu'il est trop simple.
+
 ![](imgs/loin.png)
 
 
 Pour faciliter la vie, nous avons gardé les mêmes configurations pour les 3 couches dans les essais suivants:
 
 Nous avons d'abord bien poussé le nombre de filtres par couches, jusqu'à 50
+
 ![](imgs/2024-05-10_19-23_8.png)
 
 Nous avons continué de monter (100 filtres) pour continuer sur ce gros gain de performance (90% -> 99%), mais l'overfitting nous rattrape...
@@ -58,10 +60,12 @@ Nous avons continué de monter (100 filtres) pour continuer sur ce gros gain de 
 ![](imgs/overfitting.png)
 
 Nous avons ensuite tenté de monter la taille des filtres, cela n'améliore que légèrement ici...
+
 ![](imgs/2024-05-10_19-23_7.png)
 ![](imgs/2024-05-10_18-55_1.png)
 
 Ce qui est intéressant c'est de voir que dès qu'on rebaisse de 50 à 40 de nombre de filtres, la performance est un poil moins bonne et on voit tout de suite que la distance entre les 2 courbes se creusent à nouveau. Ce paramètre a l'air crucial pour que le modèle apprenne assez.
+
 ![](imgs/2024-05-10_18-46.png)
 
 Même en augmentant la taille des filtres, on n'arrive pas à rejoindre les performances précédentes si le nombre de filtres est réduit.
@@ -71,10 +75,13 @@ Même en augmentant la taille des filtres, on n'arrive pas à rejoindre les perf
 ![](imgs/2024-05-10_18-55_2.png)
 
 ![](imgs/2024-05-10_19-01.png)
+
 Nous avons ensuite ajouté du dropout simple de 0.1 après la première couche de Conv2D + MaxPooling2D.
+
 ![](imgs/2024-05-10_19-24_2.png)
 
 Puis avec 2 dropout intermédiaires
+
 ![](imgs/2024-05-10_19-24.png)
 
 ![](imgs/2024-05-10_19-24_1.png)
@@ -84,9 +91,11 @@ Peut-être que d'avoir un deuxième dropout plus petit est plus fin en terme d'i
 Afin de pouvoir d'augmenter la complexité du modèle pour qu'il apprenne encore plus, tout en évittant l'overfitting nous avons augmenté les dropout à 2 fois 0.5, tout l'enjeu est d'arriver à donner au modèle un moyen de ne pas pouvoir se concentrer sur des mauvaises caractéristiques au lieu enlevant une partie des poids synaptiques à chaque batch, mais tout en lui laissant assez d'informations pour qu'il puisse quand même arriver à bien généraliser. En effet, si augmente trop le Dropout la performance recommence à redescendre...
 
 Nous avons aussi testé des configurations plus mélangées juste pour l'avoir testé une fois, cela ne donne rien de très facile à analyser ni de meilleur que précédemment...
+
 ![](imgs/2024-05-10_19-23.png)
 
 Voici la confirmation de notre intuition que laisser beaucoup plus d'epochs ne servira a rien, l'overfitting est énorme ici.
+
 ![](imgs/2024-05-10_22-07.png)
 ![](imgs/2024-05-10_22-13.png)
 
