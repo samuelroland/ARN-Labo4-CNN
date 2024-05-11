@@ -8,6 +8,7 @@ TODO
 <!-- What are the parameters (arguments) being used by that algorithm? -->
 <!-- What loss function is being used ? -->
 <!-- Please, give the equation(s) -->
+
 <!-- For each experiment excepted the last one (shallow network learning from raw data, -->
 <!-- shallow network learning from features and CNN): -->
 
@@ -25,6 +26,10 @@ neurons, for the CNN, try different number of neurons in the feed-forward part)
 describe the model and present the performance of the system (e.g., plot of the
 evolution of the error, nal evaluation scores and confusion matrices). Comment the
 differences in results. Are there particular digits that are frequently confused? -->
+
+TODO: 1, 2, 3 for part 2
+
+TODO: 1, 2, 3 for part 3
 
 ## Partie 4 - CNN sur digits
 Après beaucoup de tests différents pour tenter de mieux comprendre l'impact de chaque type d'hyperparamètre, voici les essais pertinents et réflexions autour que nous avons pu faire. La plupart des tests ont tournés sur 15 ou 20 epochs, le but était d'avoir un nombre petit pour pouvoir faire plein de tests différents (entre 10s et 1 minute d'exécution avec une carte graphique correcte). En testant plus d'épochs sur une plus longue durée, on se rend compte que l'amélioration est possible mais bien faible et l'overfitting devient beaucoup plus compliqué à éviter (sans compter qu'il devient très lent de tester des changements de paramètres). Nous nous sommes rendus compte que les performances sont plus variables qu'un MLP, en relançant plusieurs fois la même configuration, il semble il y avoir beaucoup plus d'impact de l'aléatoire sur le résultat, changeant parfois 1-3% de différence d'accuracy finale, cela compliquait l'analyse de micro améliorations, était-ce de la chance ou cela allait-il vraiment dans la bonne direction ?
@@ -89,15 +94,76 @@ A un moment donné, la configuration suivante (3 fois 30 filtres de 10x10, max p
 
 ![](imgs/2024-05-10_17-43.png)
 
-Notre modèle finale performe à **99.4%**, avec un léger overfitting dès 20 epochs.
+
+---
+
+Notre modèle finale lancé sur 50 epochs performe avec une accuracy de **99.4%**, avec un léger overfitting dès 20 epochs.
 ![modelefinale.png](imgs/modelefinale.png)
 
-TODO: describe topology
+La matrice de confusion de ce modèle est la suivante
+```
+array([[ 979,    0,    0,    0,    0,    0,    0,    1,    0,    0],
+       [   0, 1133,    1,    1,    0,    0,    0,    0,    0,    0],
+       [   2,    1, 1024,    0,    0,    0,    1,    3,    1,    0],
+       [   0,    0,    0, 1006,    0,    3,    0,    0,    1,    0],
+       [   0,    0,    0,    0,  976,    0,    2,    0,    0,    4],
+       [   1,    0,    0,    1,    0,  889,    1,    0,    0,    0],
+       [   2,    2,    0,    0,    0,    1,  953,    0,    0,    0],
+       [   0,    2,    3,    1,    1,    0,    0, 1020,    0,    1],
+       [   2,    1,    1,    0,    0,    2,    0,    0,  967,    1],
+       [   0,    0,    0,    0,    5,    3,    0,    0,    0, 1001]])
+```
+
+On y voit qu'il y a très peu d'erreurs, excepté quelques petites confusions plus marquées que d'autres: 3 fois le 2 classifié en 7, 3 fois le 3 en 5, 4 fois le 4 den 9, 3 fois le 7 en 2 (sens inverse), 5 fois le 9 classifié en 4 et 3 fois le 9 en 5. Ces confusions ont une certaine logique, les chiffres confondues sont généralement assez proches en termes de traits qui les composent. Par ex: 2 confondu avec 7, il y a 2 branches communes dans leur écriture.
+
+**Topologie**
+
+La topologie de notre réseau est la suivante:
+1. **Entrée** images de 28x28 sur 1 canal (noir/blanc)
+1. L1: Couche de **convolution**: **50 filtres de 10x10** avec padding et fonction d'activation `relu`
+1. L1_MP: Couche de **maxpooling**: taille de filtre 2x2
+1. **Dropout de 0.5**
+1. L2: Couche de **convolution**: **50 filtres de 10x10** avec padding et fonction d'activation `relu`
+1. L2_MP: Couche de **maxpooling**: taille de filtre 2x2
+1. **Dropout de 0.5**
+1. L3: Couche de **convolution**: **50 filtres de 10x10** avec padding et fonction d'activation `relu`
+1. L3_MP: Couche de **maxpooling**: taille de filtre 2x2
+1. Flatten des images
+1. L4: Couche cachée de **perceptrons**: **20** neurones, fonction d'activation `relu`
+1. L5: Couche de sortie de **perceptrons**: 10 neurones car 10 classes (chiffres de 0 à 9), fonction d'activation `softmax`
+
+Nous n'avons pas changé la loss function (toujours `categorical_crossentropy`) et l'optimizer `RMSprop`.
+```python
+l0 = Input(shape=(height, width, 1), name='l0')
+l1 = Conv2D(50, (10,10), padding='same', activation='relu', name='l1')(l0)
+l1_mp = MaxPooling2D(pool_size=(2,2), name='l1_mp')(l1)
+drop1 = Dropout(0.5)(l1_mp)
+l2 = Conv2D(50, (10,10), padding='same', activation='relu', name='l2')(drop1)
+l2_mp = MaxPooling2D(pool_size=(2,2), name='l2_mp')(l2)
+drop2 = Dropout(0.5)(l2_mp)
+l3 = Conv2D(50, (10,10), padding='same', activation='relu', name='l3')(drop2)
+l3_mp = MaxPooling2D(pool_size=(2,2), name='l3_mp')(l3)
+flat = Flatten(name='flat')(l3_mp)
+l4 = Dense(20, activation='relu', name='l4')(flat)
+l5 = Dense(n_classes, activation='softmax', name='l5')(l4)
+model = Model(inputs=l0, outputs=l5)
+model.summary()
+```
+
+**Nombre de poids synaptiques**
+
+Calculs:
+1. Couche de convolution: nombres de filtres * largeur filtre * hauteur filtre + autant de biais que de nombre de filtres <!-- todo: check ce calcul--> . Ici pour 50 filtres de 10x10 on aura `50*10*10 + 50= 5050` (pour L1, L2, L3)
+1. Couche de maxpooling et dropout: pas de poids synaptiques, c'est juste une transformation intermédiaire
+1. Couche de perceptrons: nombre de perceptrons * nombre de valeurs d'entrée + autant de biais que de perceptrons. Ici pour L4: `20 * 450 (après flatten) + 20 biais = 9020`. Pour L5: `10 * 20 (20 sorties car 20 neurones couches précédentes) + 10 biais = 210`
+
+TOTAL: `3 * 5050 + 920 + 210 = 16280` TODO: résultat et calculs pas du tout sûr, difficile à trouver comment bien les calculer.
+
 
 <!-- The CNNs models are deeper (have more layers), do they have more weights than the
 shallow ones? explain with one example. -->
 
-<!-- TODO: pas sur de comprendre comment y répondre à ça -->
+<!-- TODO: pas sur de comprendre comment y répondre à ça, ya une slide chap 7 qui parle de ça... -->
 
 
 <!-- 4. Train a CNN for the chest x-ray pneumonia recognition. In order to do so, complete the
