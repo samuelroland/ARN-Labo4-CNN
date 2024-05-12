@@ -2,12 +2,29 @@
 Auteurs: Felix Breval et Samuel Roland
 
 ## Introduction
-TODO
 
-<!-- What is the learning algorithm being used to optimize the weights of the neural networks? -->
-<!-- What are the parameters (arguments) being used by that algorithm? -->
-<!-- What loss function is being used ? -->
-<!-- Please, give the equation(s) -->
+> What is the learning algorithm being used to optimize the weights of the neural networks?
+
+`RMSprop` = Root Mean Square Propagation
+
+> What are the parameters (arguments) being used by that algorithm?
+
+Il y a également `learning_rate` et d'autres paramètres mais nous avons gardé les valeurs par défaut.
+
+> What loss function is being used ?
+
+La fonction de perte est `categorical_crossentropy`.
+
+> Please, give the equation(s)
+
+Equation de `categorical_crossentropy`: 
+
+![catecrossent.png](imgs/catecrossent.png)
+
+Equation de RMSProp:
+![rmsprop1.png](imgs/rmsprop1.png)
+
+![rmsprop2.png](imgs/rmsprop2.png)
 
 <!-- For each experiment excepted the last one (shallow network learning from raw data, -->
 <!-- shallow network learning from features and CNN): -->
@@ -29,7 +46,7 @@ differences in results. Are there particular digits that are frequently confused
 
 ### Partie 2 - Digits recognition sur données brutes
 
-Pour cette partie il s'agit de juste appliquer ce que nous avons pu apprendre à faire dans le laboratoire 2 et le faire pour cette base de donnée.
+Pour cette partie il s'agit de juste d'appliquer ce que nous avons pu apprendre à faire dans le laboratoire 2 et le faire pour cette base de donnée.
 
 **Sélection de la topologie du réseau neuronal :**
 Le modèle de réseau neuronal utilisé dans le code est une architecture de type MLP (Multi-Layer Perceptron) avec une couche cachée et une couche de sortie. Les entrées sont des vecteurs plats représentant des images de 28x28 pixels (784 dimensions), et il y a 10 classes de sortie correspondant aux chiffres de 0 à 9 dans le jeu de données MNIST.
@@ -69,11 +86,11 @@ Le modèle utilisé dans ce code est un MLP (Multi-Layer Perceptron) qui utilise
 
 **Calcul du nombre de poids pour chaque modèle** :
 
-Entre la couche d'entrée et la couche cachée : Le nombre de poids est 200*392+200 (pour une couche cachée de 200 neurones et un vecteur HOG de taille 392) ce qui donne 78500 poids.
+Entre la couche d'entrée et la couche cachée : Le nombre de poids est 200*392+200 (pour une couche cachée de 200 neurones et un vecteur HOG de taille 392) ce qui donne 78600 poids.
 
 Entre la couche cachée et la couche de sortie : Le nombre de poids est 200*10+10 (pour 200 neurones dans la couche cachée et 10 classes de sortie) ce qui donne 2010 poids.
 
-Total des poids : 80510 poids.
+Total des poids : 80610 poids.
 
 **Différentes approches**:
 
@@ -178,7 +195,7 @@ On y voit qu'il y a très peu d'erreurs, excepté quelques petites confusions pl
 
 **Topologie**
 
-La topologie de notre réseau est la suivante:
+La topologie de notre modèle final est la suivante:
 1. **Entrée** images de 28x28 sur 1 canal (noir/blanc)
 1. L1: Couche de **convolution**: **50 filtres de 10x10** avec padding et fonction d'activation `relu`
 1. L1_MP: Couche de **maxpooling**: taille de filtre 2x2
@@ -201,9 +218,9 @@ Calculs:
 1. Couche de maxpooling et dropout: pas de poids synaptiques, c'est juste une transformation intermédiaire
 1. Couche de perceptrons: nombre de perceptrons * nombre de valeurs d'entrée + autant de biais que de perceptrons. Ici pour L4: `20 * 450 (après flatten) + 20 biais = 9020`. Pour L5: `10 * 20 (20 sorties car 20 neurones couches précédentes) + 10 biais = 210`
 
-TOTAL: `3 * 5050 + 920 + 210 = 16280` TODO: résultat et calculs pas du tout sûr, difficile à trouver comment bien les calculer.
+TOTAL: `3 * 5050 + 920 + 210 = 16280` poids
 
-## Remaining Questions
+## Deep vs shallow
 
 **The CNNs models are deeper (have more layers), do they have more weights than the shallow ones? explain with one example**:
 
@@ -215,8 +232,8 @@ Considérons deux modèles :
 1. **Modèle Peu Profond (Shallow)** :
    - Ce modèle a une seule couche cachée entièrement connectée avec 200 neurones.
    - Supposons que la taille du vecteur d'entrée soit de 392 (comme dans notre exemple de MLP basé sur les caractéristiques HOG).
-   - Calcul des poids entre la couche d'entrée et la couche cachée : \( 200 \times 392 + 200 \) (pour les poids) + \( 200 \) (biais) = 78500 poids.
-   - Ce modèle a un total de 78500 poids.
+   - Calcul des poids entre la couche d'entrée et la couche cachée : \( 200 \times 392 + 200 \) (pour les poids) + \( 200 \) (biais) = 78600 poids.
+   - **Ce modèle a un total de 78600 poids.**
 
 2. **Modèle CNN Profond (Deep)** :
    - Ce modèle a plusieurs couches de convolution suivies de couches de pooling, puis une ou plusieurs couches entièrement connectées.
@@ -225,10 +242,11 @@ Considérons deux modèles :
    - Calculons les poids uniquement pour les couches entièrement connectées :
      - Entre la dernière couche de pooling et la couche entièrement connectée : \( 7 \times 7 \times 32 \times 200 + 200 \) (pour les poids) + \( 200 \) (biais) ≈ 313,000 poids.
    - Supposons que le nombre total de poids dans les couches de convolution soit d'environ 10,000 (ce nombre peut varier en fonction de la taille des filtres et du nombre de filtres).
-   - Ce modèle pourrait avoir un total d'environ 323,000 poids.
+   - **Ce modèle pourrait avoir un total d'environ 323,000 poids.**
 
 Dans cet exemple, bien que le modèle CNN ait plus de couches, la plupart des poids sont concentrés dans les couches entièrement connectées, en particulier dans la dernière couche avant la sortie. Cela peut conduire à un nombre total de poids plus élevé dans le modèle CNN profond par rapport au modèle peu profond.
 
+## Partie 5 - CNN sur reconnaissance de pneumonie
 **Train a CNN for the chest x-ray pneumonia recognition. In order to do so, complete the code to reproduce the architecture plotted in the notebook. Present the confusion matrix, accuracy and F1-score of the validation and test datasets and discuss your results.**:
 
 ### Ensemble de validation :
@@ -245,7 +263,7 @@ Dans cet exemple, bien que le modèle CNN ait plus de couches, la plupart des po
 - **Précision** : 93%
 - **Score F1** : 0,75
 
-La matrice de confusion montre que sur 16 échantillons de validation, 12 ont été correctement classés (6 vrais négatifs et 6 vrais positifs), et 4 ont été mal classés (2 faux positifs et 2 faux négatifs). La précision de 93% indique une proportion élevée d'échantillons correctement classés. Le score F1 de 0,75 suggère un équilibre entre la précision et le rappel.
+La matrice de confusion montre que sur 16 échantillons de validation, ce qui est un très petit échantillon, 12 ont été correctement classés (6 vrais négatifs et 6 vrais positifs), et 4 ont été mal classés (2 faux positifs et 2 faux négatifs). La précision de 93% indique une proportion élevée d'échantillons correctement classés. Le score F1 de 0,75 suggère un équilibre entre la précision et le rappel.
 
 ### Ensemble de test :
 - **Matrice de confusion** :
