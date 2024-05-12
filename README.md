@@ -79,6 +79,8 @@ Le nombre d'epochs a aussi été augmenté à 35.
 
 Nous finissons avec un f1-score de 0.9798
 
+![](imgs/lossMLP.png)
+
 ### Partie 3 - Digits recognition depuis des features dans les inputs
 
 **Sélection de la topologie du réseau neuronal** :
@@ -98,6 +100,12 @@ Pour ce modèle basé sur les caractéristiques, nous avons réalisé plusieurs 
 De plus, nous avons varié le nombre de neurones dans la couche cachée en testant les valeurs 100, 200 et 300. Après une évaluation des performances, nous avons décidé de finalement utiliser 200 neurones dans la couche cachée, car cela fournissait un bon compromis entre la capacité de représentation et la complexité du modèle.
 
 Après avoir entraîné chaque modèle avec les différentes configurations, nous avons évalué leurs performances en traçant l'évolution de l'erreur, en présentant les scores d'évaluation finaux et les matrices de confusion. Nous avons fini par prendre un pix_p_cell de 7 (avec une orientation de 8 et 200 neurones). Cela nous a donné un bon résultat qui, comparé aux autres tests, n'overfit pas.
+
+**Résultats**:
+
+Nous finissons avec un f1-score de 0.9665.
+
+![lossHOG.png](imgs/lossHOG.png)
 
 ## Partie 4 - CNN sur digits
 Après beaucoup de tests différents pour tenter de mieux comprendre l'impact de chaque type d'hyperparamètre, voici les essais pertinents et réflexions autour que nous avons pu faire. La plupart des tests ont tournés sur 15 ou 20 epochs, le but était d'avoir un nombre petit pour pouvoir faire plein de tests différents (entre 10s et 1 minute d'exécution avec une carte graphique correcte). En testant plus d'épochs sur une plus longue durée, on se rend compte que l'amélioration est possible mais bien faible et l'overfitting devient beaucoup plus compliqué à éviter (sans compter qu'il devient très lent de tester des changements de paramètres). Nous nous sommes rendus compte que les performances sont plus variables qu'un MLP, en relançant plusieurs fois la même configuration, il semble il y avoir beaucoup plus d'impact de l'aléatoire sur le résultat, changeant parfois 1-3% de différence d'accuracy finale, cela compliquait l'analyse de micro améliorations, était-ce de la chance ou cela allait-il vraiment dans la bonne direction ?
